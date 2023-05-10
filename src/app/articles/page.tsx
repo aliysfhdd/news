@@ -1,52 +1,35 @@
-'use client';
-import React, {ChangeEvent, useEffect, useRef, useState} from 'react';
-import {fetchSearchArticle} from "../../api";
-import useDebounce, {useInfiniteScrollRef} from "../../hooks";
+import { fetchMostEmail, fetchMostShared, fetchMostViewed } from "@/api";
+import ListArticle from "./ListArticle";
+import { IResult } from "@/interface/article";
 
-const Page = () => {
-	const [query, setQuery] = useState('');
-	const debouncedQuery = useDebounce(query)
-	const [articleList, setArticleList] = useState([]);
-	const hasReachEnd = useRef(false);
-	const [lastElement, page, doReset] = useInfiniteScrollRef(articleList,debouncedQuery,hasReachEnd.current);
-	const [isLoading, setIsLoading] = useState(false);
-	const showMore= articleList.length >= page * 10
-	useEffect(() => {
-		(async ()=> {
-			if(doReset) return
-			setIsLoading(true)
-			const resp= await fetchSearchArticle(debouncedQuery,page)
-			if(resp){
-				const results=resp.response.docs
-				setArticleList((prevState)=>[...prevState,...results])
-			}
-			setIsLoading(false)
-		})()
-	}, [page,doReset]);
-
-	useEffect(() => {
-		setArticleList([])
-	}, [debouncedQuery]);
-
-	const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
-		setQuery(event.target.value)
+const Page = async ({
+	searchParams,
+}: { searchParams: { [key: string]: string | string[] | undefined }}) => {
+	const filter= searchParams['filter']
+	const [email,shared,viewed]=await Promise.all([fetchMostEmail(30),fetchMostShared(30),fetchMostViewed(30)])
+	let parsedData;
+	if(filter==='email'){
+		parsedData=email
+	}
+	else if(filter==='shared'){
+		parsedData=shared
+	}
+	else if(filter==='viewed'){
+		parsedData=viewed
+	}
+	else{
+		parsedData=[...email,...shared,...viewed].reduce(function (p:IResult[], c:IResult) {
+			if (!p.some(function (el) { return el.id === c.id; })) p.push(c);
+			return p;
+		  }, []);
 	}
 
-	return (
-		<div>
-			<h2>Search Article</h2>
-			<input onChange={handleSearch}/>
-			<div>
-				{articleList && articleList.map((data) => <div>{data.uri}</div>)}
-			</div>
-			{showMore &&
-			<div ref={lastElement}>Loadingg</div>
-			}
-			{isLoading && !showMore &&
-            <div>Loadingg</div>
-			}
-		</div>
+	return(
+		<>
+		<ListArticle listData={parsedData} filter={filter}/>
+		</>
 	)
+	
 };
 
 export default Page;
