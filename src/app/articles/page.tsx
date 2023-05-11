@@ -1,13 +1,18 @@
-import { fetchMostEmail, fetchMostShared, fetchMostViewed } from "@/api";
-import ListArticle from "./ListArticle";
 import { IResult } from "@/interface/article";
+import { fetchMostEmail, fetchMostShared, fetchMostViewed } from "@/api";
+import ListArticle from "@/app/articles/listArticle";
+import Link from "next/link";
+import React from "react";
 
-const Page = async ({
-	searchParams,
-}: { searchParams: { [key: string]: string | string[] | undefined }}) => {
-	const filter= searchParams['filter']
+const Articles =async (
+	{ searchParams }:{searchParams: { [key: string]: string | string[] | undefined}}
+)=>{
+	let filter: string | string[] | undefined =''
+	if(searchParams){
+		filter=searchParams['filter']
+	}
+	let parsedData:IResult[]=[];
 	const [email,shared,viewed]=await Promise.all([fetchMostEmail(30),fetchMostShared(30),fetchMostViewed(30)])
-	let parsedData;
 	if(filter==='email'){
 		parsedData=email
 	}
@@ -18,18 +23,21 @@ const Page = async ({
 		parsedData=viewed
 	}
 	else{
-		parsedData=[...email,...shared,...viewed].reduce(function (p:IResult[], c:IResult) {
-			if (!p.some(function (el) { return el.id === c.id; })) p.push(c);
-			return p;
-		  }, []);
+		parsedData=[...email,...shared,...viewed].reduce(function (prev:IResult[], current:IResult) {
+			if (!prev.some(function (article) { return article.id === current.id; })) prev.push(current);
+			return prev
+		}, []);
 	}
-
 	return(
-		<>
-		<ListArticle listData={parsedData} filter={filter}/>
-		</>
-	)
-	
-};
+		<div>
+			<div>
+				<Link href={'/articles?filter=email'} replace>Email</Link>
+				<Link href={'/articles?filter=viewed'} replace>Viewed</Link>
+				<Link href={'/articles?filter=shared'} replace>Shared</Link>
+			</div>
+			<ListArticle listData={parsedData}></ListArticle>
+		</div>
+		)
+}
 
-export default Page;
+export default Articles

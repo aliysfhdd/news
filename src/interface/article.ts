@@ -3,6 +3,7 @@ export interface IResponseApi {
     copyright:   string;
     num_results: number;
     results:     IResult[];
+    fault?:      any;
 }
 
 export interface IResult {
@@ -28,6 +29,7 @@ export interface IResult {
     geo_facet:      string[];
     media:          IMedia[];
     eta_id:         number;
+    price:         number;
 }
 
 export interface IMedia {
