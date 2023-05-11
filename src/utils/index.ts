@@ -59,6 +59,23 @@ export const getArticleById=(id:number)=>{
 	return null
 }
 
+export const removeBoughtArticleById=(id:number)=>{
+	let articles=localStorage.getItem("boughtArticle");
+	if(articles){
+		let updatedArr=JSON.parse(articles).filter((data:IResult)=>data.id!=id)
+		localStorage.setItem("boughtArticle", JSON.stringify(updatedArr))
+	}
+}
+
+export const isUserAlreadyBought=(id:number)=>{
+	let articles=localStorage.getItem("boughtArticle");
+	if(articles){
+		let result=JSON.parse(articles).filter((data:IResult)=>data.id==id)
+		return !!result.length
+	}
+	return false
+}
+
 export const initMoney=()=>{
 	let balance=localStorage.getItem("balance")
 	let totalPurchase=localStorage.getItem("total_purchase")
