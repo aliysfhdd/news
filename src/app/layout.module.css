@@ -1,0 +1,23 @@
+.main {
+  min-height: 100vh;
+}
+.navbar {
+  display: flex;
+  justify-content: space-around;
+  height: 100px;
+  align-items: center;
+  font-weight: bolder;
+  border-bottom: 1px solid white;
+}
+.navbar a{
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+}
+
+.navbar a:hover{
+  background: aliceblue;
+  color: black;
+}

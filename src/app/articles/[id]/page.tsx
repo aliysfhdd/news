@@ -1,18 +1,25 @@
 'use client'
 import React, { useEffect, useState } from 'react';
-import { buyArticle, getArticleById } from "@/utils";
+import {buyArticle, getArticleById, getCurrentBalance, numberFormat} from "@/utils";
 import { IMedia, IResult } from "@/interface/article";
 import { useRouter } from "next/navigation";
+import {E_BUY_ARTICLE} from "@/constants";
+import styles from './page.module.css';
+
 
 const Detail = ({
 	params,
 }: { params: { id: number }; })=>{
+	const[currentBalance,setCurrentBalance]=useState(0)
 	const router=useRouter()
 	const [data, setData] = useState<IResult | null>(null);
 	useEffect(() => {
 		const res= getArticleById(params.id)
 		if(res)setData(res)
-		else router.push('/articles')
+		else {
+			alert('Oops! article that you find is not found')
+			router.push('/articles')
+		}
 	}, []);
 	const getImageUrl=(title:string,media:IMedia[])=>{
 		let url=media.at(-1)?.["media-metadata"].at(-1)?.url
@@ -24,27 +31,34 @@ const Detail = ({
 
 	const onClickBuy=(data:IResult)=>{
 		let res= buyArticle(data);
-		if(res==='Fail'){
+		if(res===E_BUY_ARTICLE.INSUFFICIENT){
 			alert("You didnt have enough money")
 		}
-		else if(res==="Already"){
+		else if(res===E_BUY_ARTICLE.ALREADY){
 			alert("You already buy this article")
 		}
 		else {
 			alert('Success!')
+			router.refresh()
 		}
 	}
+	useEffect(()=>{
+		setCurrentBalance(getCurrentBalance())
+	},[])
 	return (
 		<div>
 			{data &&
-				<div>
-					<p>{data.title}</p>
-					<p>{data.abstract}</p>
-					<p>{data.source}</p>
+				<div className={styles.wrapperDetail}>
+					<h2>{data.title}</h2>
 					<p>{data.byline}</p>
 					<p>{data.published_date.toString()}</p>
 					{getImageUrl(data.title,data.media)}
-					<button onClick={()=>onClickBuy(data)}>Buy</button>
+					<p>{data.abstract}</p>
+					<p>Source: {data.source}</p>
+					<div style={{display:'flex',alignItems:'center'}}>
+						<button className={styles.buttonBuy} onClick={()=>onClickBuy(data)}>Buy {data.price==0 ? 'Free': numberFormat(data.price)}</button>
+						<p>Current Balance: {numberFormat(currentBalance)}</p>
+					</div>
 				</div>
 			}
 		</div>

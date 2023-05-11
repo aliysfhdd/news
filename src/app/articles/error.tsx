@@ -1,10 +1,11 @@
 'use client'
 import React from 'react';
+import styles from './error.module.css';
 
 const Error = () => {
   return (
-    <div>
-      Error
+    <div className={styles.error}>
+      Ooops... currently too many request
     </div>
   );
 };

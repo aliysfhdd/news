@@ -1,5 +1,17 @@
 import { IResponseApi, IResult } from "@/interface/article";
-const OPTION_PRICE=[10_000,1_000,5_000]
+
+const generatePriceArticle=(date:Date):number=>{
+	const currDate= new Date();
+	const pastWeek = new Date(new Date().setDate(currDate.getDate()-7));
+	const yesterday = new Date(new Date().setDate(currDate.getDate()-1));
+	if(new Date(date)<pastWeek){
+		return 0
+	}
+	if(new Date(date)>pastWeek && new Date(date)<yesterday){
+		return 20_000
+	}
+	return 50_000
+}
 export const fetchMostEmail=async (day:1 | 7 | 30):Promise<IResult[]>=> {
 	let url=`https://api.nytimes.com/svc/mostpopular/v2/emailed/${day}.json?`
 	let param={
@@ -11,7 +23,7 @@ export const fetchMostEmail=async (day:1 | 7 | 30):Promise<IResult[]>=> {
 		throw Error('Max Call')
 	}
 	return jsonData.results.map((data)=> {
-		data.price = OPTION_PRICE[Math.floor(Math.random() * OPTION_PRICE.length)]
+		data.price = generatePriceArticle(data.published_date)
 		return data
 	})
 }
@@ -28,7 +40,7 @@ export const fetchMostShared=async (day:1 | 7 | 30):Promise<IResult[]>=> {
 		throw Error('Max Call')
 	}
 	return jsonData.results.map((data)=> {
-		data.price = OPTION_PRICE[Math.floor(Math.random() * OPTION_PRICE.length)]
+		data.price = generatePriceArticle(data.published_date)
 		return data
 	})
 }
@@ -44,21 +56,8 @@ export const fetchMostViewed=async (day:1 | 7 | 30):Promise<IResult[]>=> {
 		throw Error('Max Call')
 	}
 	return jsonData.results.map((data)=> {
-		data.price = OPTION_PRICE[Math.floor(Math.random() * OPTION_PRICE.length)]
+		data.price = generatePriceArticle(data.published_date)
 		return data
 	})
-}
-
-export const fetchArticleByWebURL= async (web_url:string):Promise<any>=> {
-	let url="https://api.nytimes.com/svc/search/v2/articlesearch.json?"
-	let param={
-		'api-key':'NsnpPmn8d8c3ZmmEHjU3SkNkXX5Jv297',
-		'fl':'headline,web_url',
-		'q':web_url
-	}
-
-	const response = await fetch(url + new URLSearchParams(param));
-	const jsonData = await response.json();
-	return jsonData
 }
 

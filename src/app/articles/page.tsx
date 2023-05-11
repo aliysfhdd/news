@@ -3,6 +3,8 @@ import { fetchMostEmail, fetchMostShared, fetchMostViewed } from "@/api";
 import ListArticle from "@/app/articles/listArticle";
 import Link from "next/link";
 import React from "react";
+import {FILTER_NAME} from "@/constants";
+import styles from './page.module.css';
 
 const Articles =async (
 	{ searchParams }:{searchParams: { [key: string]: string | string[] | undefined}}
@@ -12,14 +14,14 @@ const Articles =async (
 		filter=searchParams['filter']
 	}
 	let parsedData:IResult[]=[];
-	const [email,shared,viewed]=await Promise.all([fetchMostEmail(30),fetchMostShared(30),fetchMostViewed(30)])
-	if(filter==='email'){
+	const [email,shared,viewed]=await Promise.all([fetchMostEmail(7),fetchMostShared(1),fetchMostViewed(30)])
+	if(filter===FILTER_NAME.EMAILED){
 		parsedData=email
 	}
-	else if(filter==='shared'){
+	else if(filter===FILTER_NAME.SHARED){
 		parsedData=shared
 	}
-	else if(filter==='viewed'){
+	else if(filter===FILTER_NAME.VIEWED){
 		parsedData=viewed
 	}
 	else{
@@ -29,11 +31,20 @@ const Articles =async (
 		}, []);
 	}
 	return(
-		<div>
-			<div>
-				<Link href={'/articles?filter=email'} replace>Email</Link>
-				<Link href={'/articles?filter=viewed'} replace>Viewed</Link>
-				<Link href={'/articles?filter=shared'} replace>Shared</Link>
+		<div className={styles.listArticle}>
+			<div className={styles.filter}>
+				<Link href={'/articles?filter=email'} replace>
+					<p style={filter===FILTER_NAME.EMAILED ?
+						{background: 'white', color:'black'}: {}}>Most Emailed</p>
+				</Link>
+				<Link href={'/articles?filter=viewed'} replace>
+					<p style={filter===FILTER_NAME.VIEWED ?
+						{background: 'white', color:'black'}: {}}>Most Viewed</p>
+				</Link>
+				<Link href={'/articles?filter=shared'} replace>
+					<p style={filter===FILTER_NAME.SHARED ?
+						{background: 'white', color:'black'}: {}}>Most Shared</p>
+				</Link>
 			</div>
 			<ListArticle listData={parsedData}></ListArticle>
 		</div>

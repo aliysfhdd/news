@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { getMyBoughtArticle } from "@/utils";
 import { IResult } from "@/interface/article";
 import ListArticle from "@/app/articles/listArticle";
+import styles from "@/app/articles/page.module.css";
 
 const MyArticle = () => {
   const [listData, setListData] = useState<IResult[]>([]);
@@ -11,7 +12,7 @@ const MyArticle = () => {
   }, []);
 
   return (
-    <div>
+    <div className={styles.listArticle}>
       <ListArticle listData={listData}></ListArticle>
     </div>
   );

@@ -1,0 +1,15 @@
+.buttonBuy{
+    padding: 10px 20px;
+    background: white;
+    color: black;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+.wrapperDetail{
+    padding: 10px;
+}
+
+.wrapperDetail p{
+    margin: 10px;
+}

@@ -1,0 +1,19 @@
+.listArticle{
+    padding: 10px;
+}
+
+.filter {
+    display: flex;
+    justify-content: space-around;
+    height: 50px;
+    align-items: center;
+    font-weight: bolder;
+    border-bottom: 1px solid white;
+}
+.filter a, .filter p{
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50px;
+}

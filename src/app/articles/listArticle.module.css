@@ -1,0 +1,18 @@
+.search{
+    display: flex;
+    gap: 20px;
+    padding: 20px 0;
+    justify-content: center;
+    align-items: center;
+}
+.search input {
+    flex:1;
+    padding:10px;
+    border: none;
+    border-radius: 15px;
+}
+.balance{
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}

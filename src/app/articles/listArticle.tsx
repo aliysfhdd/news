@@ -4,18 +4,21 @@ import useDebounce, { useInfiniteScrollRef } from "@/hooks";
 import { IResult } from "@/interface/article";
 import Link from "next/link";
 import Article from "@/app/articles/article";
-import { initMoney } from "@/utils";
+import {getCurrentBalance, initMoney, numberFormat} from "@/utils";
+import styles from './listArticle.module.css';
 
+const ITEM_PER_PAGE=10
 const ListArticle = ({listData}:{listData:IResult[]}) => {
+  const [currentBalance,setCurrentBalance]=useState(0)
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query)
   const [articleList, setArticleList] = useState<IResult[]>([]);
   const [lastElement, page] = useInfiniteScrollRef(articleList,debouncedQuery,listData);
-  const showMore= articleList.length >= page * 10
+  const showMore= articleList.length >= page * ITEM_PER_PAGE
   useEffect(() => {
     (async ()=> {
       if(page>1){
-        setArticleList((prevState)=>[...prevState,...listData.slice((page-1) * 10,page * 10)])
+        setArticleList((prevState)=>[...prevState,...listData.slice((page-1) * ITEM_PER_PAGE,page * ITEM_PER_PAGE)])
       }
     })()
   }, [page]);
@@ -33,22 +36,28 @@ const ListArticle = ({listData}:{listData:IResult[]}) => {
   }
 
   useEffect(()=>{
-    setArticleList(listData.slice(0,10))
+    setArticleList(listData.slice(0,ITEM_PER_PAGE))
   },[listData])
 
   useEffect(() => {
-    setArticleList(listData.filter((data)=>data.title.toLowerCase().includes(debouncedQuery.toLowerCase())).slice(0,10))
+    setArticleList(listData.filter((data)=>data.title.toLowerCase().includes(debouncedQuery.toLowerCase())).slice(0,ITEM_PER_PAGE))
   }, [debouncedQuery]);
 
 
   useEffect(() => {
-    initMoney()
+    initMoney();
+    setCurrentBalance(getCurrentBalance())
   }, []);
 
   return (
     <div>
-      <h2>Search Article</h2>
-      <input onChange={handleSearch}/>
+      <div className={styles.balance}>
+        <p>My Balance: {numberFormat(currentBalance)}</p>
+      </div>
+      <div className={styles.search}>
+        <h2>Search Article</h2>
+        <input onChange={handleSearch} placeholder={'Search title'}/>
+      </div>
       <div>
         {articleList && articleList.map((data) => <Article key={data.id} data={data}/>)}
       </div>
